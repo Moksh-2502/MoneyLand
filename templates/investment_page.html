@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
+        img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .back-button {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .bookmark-button {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .investment-form {
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Property Details</h1>
+        <div>
+            <!-- Display property details -->
+            <p><strong>Property ID:</strong> {{ property_info[0] }}</p>
+            <p><strong>User Name:</strong> {{ property_info[7] }}</p>
+            <p><strong>Address:</strong> {{ property_info[6] }}</p>
+            <p><strong>Price:</strong> ₹{{ property_price }}</p>
+            <p><strong>Total Investment Amount:</strong> ₹{{ total_investment }}</p>
+            <p><strong>Description:</strong> {{ property_info[2] }}</p>
+            <p><strong>Investing Reason:</strong> {{ property_info[3] }}</p>
+            <p><strong>Profit Scope:</strong> {{ property_info[4] }}</p>
+            
+            <!-- Display property image -->
+            {% for image_path in image_paths %}
+                <img src="{{ image_path[0] }}" alt="Property Image">
+            {% endfor %}
+
+            <!-- Bookmark form -->
+            <form method="POST" action="/bookmark" id="bookmark-form">
+                <input type="hidden" name="property_id" value="{{ property_info[0] }}">
+                <button type="button" class="btn btn-secondary bookmark-button" id="bookmark-button">Bookmark</button>
+            </form>
+
+            <!-- Investment form -->
+            <form method="POST" action="/invest" class="investment-form">
+                <div class="form-group">
+                    <label for="investmentRange">Investment Amount:</label>
+                    <input type="range" class="form-control-range" id="investmentRange" name="investment" min="0" max="{{ remaining_amount }}" value="{{ remaining_amount }}">
+                </div>
+                <div class="form-group">
+                    <label for="investmentAmount">Investment Amount:</label>
+                    <input type="number" class="form-control" id="investmentAmount" name="investment_amount" min="0" max="{{ remaining_amount }}" value="{{ remaining_amount }}">
+                </div>
+                <input type="hidden" name="property_id" value="{{ property_info[0] }}">
+                <button type="submit" class="btn btn-primary btn-block">Invest</button>
+            </form>
+        </div>
+        <!-- Back to Home button -->
+        <a href="/" class="btn btn-primary back-button">Back to Home</a>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the property image path
+            var propertyImagePath = "{{ property_info[5] }}";
+            // Replace backslashes with forward slashes (for Windows paths)
+            var path = propertyImagePath.replace(/\\/g, '/');
+            // Set the image source
+            document.getElementById('property-image').src = path;
+
+            // Bookmark button functionality
+            var bookmarkButton = document.getElementById('bookmark-button');
+            var bookmarkForm = document.getElementById('bookmark-form');
+            bookmarkButton.addEventListener('click', function() {
+                bookmarkForm.submit();
+            });
+
+            // Investment amount range and input synchronization
+            var investmentRange = document.getElementById('investmentRange');
+            var investmentAmount = document.getElementById('investmentAmount');
+            investmentRange.addEventListener('input', function() {
+                investmentAmount.value = investmentRange.value;
+            });
+            investmentAmount.addEventListener('input', function() {
+                investmentRange.value = investmentAmount.value;
+            });
+        });
+    </script>
+</body>
+</html>

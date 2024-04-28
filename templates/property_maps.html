@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Map</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    /* Reset styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Full-width black top bar */
+    .top-bar {
+      background-color: #333;
+      color: #333;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 200px;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Search dropdown styles */
+    .search-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .search-dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1000;
+      top: 35px;
+      left: 0;
+    }
+
+    .search-dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .search-dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .search-dropdown:hover .search-dropdown-content {
+      display: block;
+    }
+
+    /* Map container */
+    #map {
+      height: calc(100vh - 70px); /* Adjust based on the height of the top bar */
+      width: 100%;
+      z-index: 1;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0; /* Extend sidebar to the bottom */
+      width: 200px;
+      background-color: #333;
+      color: #e0d1d1;
+      padding: 10px;
+      overflow-y: auto; /* Enable scrolling for the sidebar */
+      z-index: 999;
+    }
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+    .sidebar a {
+      text-decoration: none;
+      color: #fff;
+    }
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+
+    /* Property thumbnails container */
+    .thumbnails {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+    }
+
+    .thumbnail {
+      width: 150px;
+      margin: 10px;
+    }
+
+    .thumbnail img {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .popup-button {
+      margin-top: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+    }
+
+    .search-button {
+      color: #333;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Full-width black top bar -->
+  <div class="top-bar">
+    <div class="search-bar">
+      <div class="search-dropdown">
+        <input type="text" placeholder="Search location..." id="searchInput" onkeyup="filterFunction()">
+        <div class="search-dropdown-content" id="myDropdown">
+          <!-- Dropdown suggestions will be added here -->
+        </div>
+      </div>
+      <button class="search-button" onclick="searchLocation()">Search</button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+      <li><a href="/home">Home  </a></li>
+      <li><a href="/list_properties">List Properties</a></li>
+      <li><a href="/your_investments">Your Investments</a></li>
+      <li><a href="/about_us">About Us</a></li>
+    </ul>
+  </div>
+
+  <!-- Map container -->
+  <div id="map"></div>
+
+  <!-- Property thumbnails container -->
+  <div class="thumbnails">
+    <!-- Thumbnails will be dynamically added here -->
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Initialize map
+    var map = L.map('map').setView([28.7041, 77.1025], 13); // Centered at (0,0), zoom level 2
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Function to handle click event on "More Info" button
+    function showPropertyInfo(propertyId) {
+      // Redirect to the investment page with the property ID as a query parameter
+      window.location.href = `/investment-page?property_id=${propertyId}`;
+    }
+
+    // Function to filter search results
+    function filterFunction() {
+      var input, filter, div, a, i;
+      input = document.getElementById("searchInput");
+      filter = input.value.toUpperCase();
+      div = document.getElementById("myDropdown");
+      a = div.getElementsByTagName("a");
+      for (i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          a[i].style.display = "";
+        } else {
+          a[i].style.display = "none";
+        }
+      }
+    }
+
+    // Function to search location
+    function searchLocation() {
+      var searchInput = document.getElementById('searchInput').value;
+      // Use a geocoding service to convert the location into coordinates
+      // For example, you can use the OpenStreetMap Nominatim API
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchInput}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            var lat = parseFloat(data[0].lat);
+            var lon = parseFloat(data[0].lon);
+            // Center the map on the searched location
+            map.setView([lat, lon], 13);
+          } else {
+            alert('Location not found');
+          }
+        })
+        .catch(error => console.error('Error searching location:', error));
+    }
+
+    // Fetch properties from the server
+    fetch('/get-properties')
+      .then(response => response.json())
+      .then(properties => {
+        properties.forEach(property => {
+          // Add marker to the map for each property
+          const marker = L.marker([property[4], property[5]]).addTo(map);
+          marker.bindPopup(`
+            <b>Property ID:</b> ${property[0]}
+            <br>
+            <b>Address:</b> ${property[2]}
+            <br>
+            <b>Price:</b> ${property[3]}
+            <br>
+            <button class="popup-button" onclick="showPropertyInfo(${property[0]})">More Info</button>
+          `);
+          // Add thumbnail below the map for each property
+          const thumbnail = document.createElement('div');
+          thumbnail.classList.add('thumbnail');
+          thumbnail.innerHTML = `<img src="uploads${property[6]}" alt="Property Thumbnail">`;
+          document.querySelector('.thumbnails').appendChild(thumbnail);
+        });
+      })
+      .catch(error => console.error('Error fetching properties:', error));
+  </script>
+</body>
+</html>

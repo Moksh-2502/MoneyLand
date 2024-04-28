@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real Estate Management</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      position: relative;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+    }
+    .sidebar h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+    .sidebar a {
+      text-decoration: none;
+      color: #fff;
+    }
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+    #map {
+      flex: 1;
+      height: 100vh;
+    }
+    .search-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .search-container input[type=text] {
+      width: 200px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .search-container button {
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .search-container button:hover {
+      background-color: #45a049;
+    }
+    .popup-content {
+      text-align: center;
+    }
+    .popup-content input[type=text],
+    .popup-content input[type=number],
+    .popup-content button {
+      margin: 5px;
+      padding: 5px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .popup-content button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .popup-content button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Navigation</h2>
+      <ul>
+        <li><a href="/home">Home  </a></li>
+        <li><a href="/list_properties">List Properties</a></li>
+        <li><a href="/your_investments">Your Investments</a></li>
+        <li><a href="/about_us">About Us</a></li>
+      </ul>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+      <input type="text" id="locationInput" placeholder="Search location...">
+      <button onclick="searchLocation()">Search</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=a1e9793d-bed4-4986-949c-24f3abf9e654"></script>
+  <script>
+    // Initialize map
+    var map = L.map('map').setView([28.7041, 77.1025], 13);
+
+    // Add tile layer
+    var mapTiles = 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=a1e9793d-bed4-4986-949c-24f3abf9e654';
+    L.tileLayer(mapTiles, {
+      maxZoom: 20,
+      attribution: '© Stadia Maps'
+    }).addTo(map);
+
+    // Function to search location
+    function searchLocation() {
+      var location = document.getElementById('locationInput').value;
+      // Use a geocoding service to convert the location into coordinates
+      // For example, you can use the OpenStreetMap Nominatim API
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            var lat = parseFloat(data[0].lat);
+            var lon = parseFloat(data[0].lon);
+            // Center the map on the searched location
+            map.setView([lat, lon], 13);
+          } else {
+            alert('Location not found');
+          }
+        })
+        .catch(error => console.error('Error searching location:', error));
+    }
+
+    // Function to add marker
+    function addMarker(latlng) {
+      var marker = L.marker(latlng, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<span style="color: white; font-size: 18px;">New</span>'
+        })
+      }).addTo(map);
+    }
+
+    // Handle map click event
+    map.on('click', function(e) {
+      // Create form for adding property
+      var form = document.createElement('form');
+      form.classList.add('property-form');
+      form.setAttribute('action', '/add-property');
+      form.setAttribute('method', 'GET');
+      form.innerHTML = `
+        <div class="popup-content">
+          <h3>Add Property</h3>
+          <label for="address">Address:</label>
+          <input type="text" id="address" name="address" required><br>
+          <label for="price">Price:</label>
+          <input type="text" id="price" name="price" required><br>
+          <label for="latitude">Latitude:</label>
+          <input type="text" id="latitude" name="latitude" value="${e.latlng.lat}" required><br>
+          <label for="longitude">Longitude:</label>
+          <input type="text" id="longitude" name="longitude" value="${e.latlng.lng}" required><br>
+          <label for="tenure">Tenure (in years):</label>
+          <input type="number" id="tenure" name="tenure" min="1" required><br>
+          <button type="submit">Add Property</button>
+        </div>
+      `;
+
+      // Show popup with form on map click
+      var popup = L.popup()
+        .setLatLng(e.latlng)
+        .setContent(form)
+        .openOn(map);
+
+      // Handle form submission
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(form);
+        var latitude = formData.get('latitude');
+        var longitude = formData.get('longitude');
+        var tenure = formData.get('tenure');
+
+        var queryString = `?address=${formData.get('address')}&price=${formData.get('price')}&latitude=${latitude}&longitude=${longitude}&tenure=${tenure}`;
+        window.location.href = '/add-property' + queryString;
+      });
+
+      // Add marker to clicked location
+      addMarker(e.latlng);
+    });
+  </script>
+</body>
+</html>

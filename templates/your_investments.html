@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Investments</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            margin-top: 40px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .investment {
+            border-left: 5px solid #007bff; /* Blue border for investments */
+        }
+        .bookmark {
+            border-left: 5px solid #28a745; /* Green border for bookmarks */
+        }
+        .property-info {
+            margin-bottom: 10px;
+        }
+        .property-info strong {
+            display: inline-block;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Investments</h1>
+
+        <h2>Investments</h2>
+        <ul>
+            {% for investment in investments %}
+            <li class="investment">
+                <div class="property-info">
+                    <strong>Property ID:</strong> {{ investment[0] }}
+                </div>
+                <div class="property-info">
+                    <strong>Address:</strong> {{ investment[1] }}
+                </div>
+                <div class="property-info">
+                    <strong>Amount:</strong> ₹{{ investment[2] }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Bookmarks</h2>
+        <ul>
+            {% for bookmark in bookmarks %}
+            <li class="bookmark">
+                <div class="property-info">
+                    <strong>Property ID:</strong> {{ bookmark[1] }}
+                </div>
+                <div class="property-info">
+                    <strong>Address:</strong> {{ bookmark[2] }}
+                </div>
+                <div class="property-info">
+                    <strong>Price:</strong> ₹{{ bookmark[3] }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

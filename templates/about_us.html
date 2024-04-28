@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1, h2 {
+      margin-bottom: 20px;
+    }
+    .team-members {
+      display: flex;
+      justify-content: space-between;
+    }
+    .team-member {
+      width: 23%; 
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .team-member img {
+      width: 150px;
+      height: 150px;
+    }
+    .team-member h3 {
+      margin-top: 10px;
+    }
+    .contribution-button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>About Us</h1>
+    <p>Our startup is focused on developing an application that facilitates the pooling of money from different individuals to collectively invest in real estate properties. The aim is to create a platform where users can come together to invest in properties, share ownership, and potentially earn returns on their investments. We are giving an opportunity to small investors who can't invest in big properties, which often yield greater profits.</p>
+    
+    <h2>Our Team Members</h2>
+    
+    <div class="team-members">
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='moksh.jpeg') }}" alt="Team Member 1">
+        <h3>Moksh</h3>
+        <div class="dropdown">
+          <button class="contribution-button">Contribution</button>
+          <div class="dropdown-content">
+            <a href="#">Frontend</a>
+            <a href="#">Backend</a>
+            <a href="#">Database</a>
+          </div>
+        </div>
+      </div>
+    
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='mayank.jpg') }}" alt="Team Member 2">
+        <h3>Mayank Sharma</h3>
+        <div class="dropdown">
+          <button class="contribution-button">Contribution</button>
+          <div class="dropdown-content">
+            <a href="#">frontend</a>
+            <a href="#">writeups</a>
+            <a href="#"></a>
+          </div>
+        </div>
+      </div>
+    
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='shivansh.png') }}" alt="Team Member 3">
+        <h3>Shivansh Chauhan</h3>
+        <div class="dropdown">
+          <button class="contribution-button">Contribution</button>
+          <div class="dropdown-content">
+            <a href="#">Report</a>
+            <a href="#">PPT</a>
+            <a href="#">Architecture Design</a>
+            <a href="#">Cost Estimation</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='user-icon.png') }}" alt="Team Member 4">
+        <h3>Ali Naqvi</h3>
+        <div class="dropdown">
+          <button class="contribution-button">Contribution</button>
+          <div class="dropdown-content">
+            <a href="#">Research</a>
+            <a href="#">Analysis</a>
+            <a href="#">Operations</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
